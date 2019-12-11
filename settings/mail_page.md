@@ -93,8 +93,65 @@ cat spec/fixtures/mail_page/UTF-8.eml | rake mail_page:import site=www
 ４. 成功するとメール取込フォルダー配下にページが作成されます。<br />
 サイト設定のジョブにも取り込んだログがのこります。
 
-## サーバーのメール受信設定
+## サーバー側メール取り込み設定
 
-サーバーでメールを受信し、SHIRASAGIのタスクに標準入力として引き渡す設定が必要になります...
+サーバーでメールを受信し、SHIRASAGIのタスクに標準入力として引き渡す設定が必要になります。
+以下、取り込みメールのアドレスは sample@example.jp として説明します。
 
-他、セキュリティ的な設定など...
+１．メールサーバを設定します。
+外部より sample@example.jp のメールが受信できるように設定します。
+
+２．取り込みコマンドの実行ユーザを作成します。
+sudoがNOPASSWDで利用できるユーザを作成します。以下、mailinfo ユーザとします。
+
+
+３．受信メールをSHIRASAGIに反映する為のシェルスクリプトを準備します。
+
+~~~
+# mkdir /var/www/mailhook/shirasagi -p
+# cd /var/www/mailhook/shirasagi
+# vi hook.sh
+~~~
+
+~~~
+"| sudo /var/www/mailhook/shirasagi/script.sh"
+~~~
+
+~~~
+# chown mailinfo. hook.sh
+# vi script.sh
+~~~
+
+~~~
+#!/bin/bash
+
+export PATH=$PATH:/usr/local/rvm/wrappers/default;
+umask 022
+
+data=$( cat - )
+data=$( echo "$data" | sed "s/$/\r/g" )
+
+echo "$data" > /tmp/sample
+echo "${USER}" > /tmp/sample_user
+cd /var/www/shirasagi
+echo "$data" | rake mail_page:import site=www
+~~~
+
+~~~
+# chmod 777 script.sh
+~~~
+
+４．メール受信にて取り込みスクリプトを動作させるようにエイリアスを設定します。
+
+~~~
+# vi /etc/aliases
+~~~
+
+~~~
+# Shirasagi Mail Hook
+sample: mailinfo, :include:/var/www/mailhook/shirasagi/hook.sh
+~~~
+
+~~~
+# newaliases
+~~~
