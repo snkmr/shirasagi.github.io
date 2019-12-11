@@ -95,13 +95,13 @@ cat spec/fixtures/mail_page/UTF-8.eml | rake mail_page:import site=www
 
 ## サーバー側メール取り込み設定
 
-サーバーでメールを受信し、SHIRASAGIのタスクに標準入力として引き渡す設定が必要になります。
+サーバーでメールを受信し、SHIRASAGIのタスクに標準入力として引き渡す設定が必要になります。<br />
 以下、取り込みメールのアドレスは sample@example.jp として説明します。
 
-１．メールサーバを設定します。
+１．メールサーバを設定します。<br />
 外部より sample@example.jp のメールが受信できるように設定します。
 
-２．取り込みコマンドの実行ユーザを作成します。
+２．取り込みコマンドの実行ユーザを作成します。<br />
 sudoがNOPASSWDで利用できるユーザを作成します。以下、mailinfo ユーザとします。
 
 
